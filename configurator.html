@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Своё изделие — Мастерская Савеловых</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #F5E6D3;
+    color: #2C2416;
+  }
+
+  nav {
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2C2416;
+    color: #F5E6D3;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+  }
+  .logo span { color: #D4A574; }
+  nav a {
+    color: #F5E6D3;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.3s;
+  }
+  nav a:hover { color: #D4A574; }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 30px 100px;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #7A6B55;
+    margin-bottom: 50px;
+    font-size: 16px;
+  }
+
+  .configurator {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .configurator { grid-template-columns: 1fr; }
+  }
+
+  /* Схема будки */
+  .preview {
+    background: #fff;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(44,36,22,0.1);
+    position: sticky;
+    top: 30px;
+  }
+  .preview svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+  }
+  .preview svg g {
+    transition: filter 0.3s;
+  }
+  .preview svg g:hover {
+    filter: brightness(1.15) drop-shadow(0 0 8px #D4A574);
+  }
+  .preview svg g.active {
+    filter: drop-shadow(0 0 12px #D4A574);
+  }
+
+  .hint {
+    text-align: center;
+    color: #7A6B55;
+    font-size: 14px;
+    margin-top: 16px;
+    font-style: italic;
+  }
+
+  /* Панель управления */
+  .controls { }
+  .part-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+  .part-btn {
+    padding: 12px 22px;
+    background: #fff;
+    border: 2px solid #e5d9c3;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2C2416;
+    transition: all 0.3s;
+  }
+  .part-btn:hover {
+    border-color: #D4A574;
+  }
+  .part-btn.active {
+    background: #2C2416;
+    color: #F5E6D3;
+    border-color: #2C2416;
+  }
+
+  .color-panel {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(44,36,22,0.08);
+    margin-bottom: 24px;
+  }
+  .color-panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .colors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 14px;
+  }
+  .color-swatch {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.25s;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+  }
+  .color-swatch:hover {
+    transform: scale(1.08);
+  }
+  .color-swatch.selected {
+    border-color: #D4A574;
+    box-shadow: 0 0 0 3px rgba(212,165,116,0.4);
+  }
+  .color-swatch span {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: #7A6B55;
+    white-space: nowrap;
+  }
+
+  /* Заявка */
+  .order-form {
+    background: #2C2416;
+    color: #F5E6D3;
+    border-radius: 20px;
+    padding: 30px;
+  }
+  .order-form h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .order-form input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.1);
+    color: #F5E6D3;
+  }
+  .order-form input::placeholder { color: #a09483; }
+  .order-form input:focus {
+    outline: 2px solid #D4A574;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: #D4A574;
+    color: #2C2416;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 8px;
+  }
+  .submit-btn:hover {
+    background: #c39460;
+    transform: translateY(-2px);
+  }
+
+  .summary {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+  .summary strong {
+    font-family: 'Playfair Display', serif;
+    display: block;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .summary .row { display: flex; justify-content: space-between; border-bottom: 1px dashed #e5d9c3; padding: 6px 0; }
+  .summary .row:last-child { border-bottom: none; }
+  .summary .row span:first-child { color: #7A6B55; }
+  .summary .row span:last-child { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Мастерская <span>Савеловых</span></div>
+  <a href="index.html">← На главную</a>
+</nav>
+
+<div class="container">
+  <h1>Соберите свою будку</h1>
+  <p class="subtitle">Кликните на деталь на схеме и выберите цвет</p>
+
+  <div class="configurator">
+
+    <!-- Схема будки -->
+    <div class="preview">
+      <svg viewBox="0 0 400 400" id="doghouse">
+        <!-- Крыша -->
+        <g id="roof" data-part="roof">
+          <polygon points="200,60 60,180 340,180" fill="#A0704A" stroke="#5C3A1E" stroke-width="2" stroke-linejoin="round"/>
+          <polygon points="200,60 60,180 340,180" fill="url(#roofTexture)" opacity="0.3"/>
+        </g>
+
+        <!-- Стены -->
+        <g id="walls" data-part="walls">
+          <rect x="90" y="180" width="220" height="160" fill="#C0915F" stroke="#5C3A1E" stroke-width="2"/>
+        </g>
+
+        <!-- Пол (виден внизу) -->
+        <g id="floor" data-part="floor">
+          <rect x="80" y="340" width="240" height="20" fill="#7B5230" stroke="#5C3A1E" stroke-width="2"/>
+        </g>
+
+        <!-- Вход (круг) -->
+        <g id="entrance" data-part="entrance">
+          <circle cx="200" cy="260" r="55" fill="#3D2410" stroke="#5C3A1E" stroke-width="2"/>
+          <circle cx="200" cy="260" r="55" fill="url(#entranceTexture)" opacity="0.5"/>
+        </g>
+
+        <!-- Текстуры (для реалистичности) -->
+        <defs>
+          <pattern id="roofTexture" patternUnits="userSpaceOnUse" width="10" height="10">
+            <line x1="0" y1="0" x2="10" y2="10" stroke="#5C3A1E" stroke-width="0.5" opacity="0.5"/>
+          </pattern>
+          <pattern id="entranceTexture" patternUnits="userSpaceOnUse" width="8" height="8">
+            <circle cx="4" cy="4" r="0.5" fill="#000" opacity="0.3"/>
+          </pattern>
+        </defs>
+      </svg>
+      <p class="hint">Нажмите на любую часть: крышу, стены, пол или вход</p>
+    </div>
+
+    <!-- Панель управления -->
+    <div class="controls">
+
+      <div class="part-selector">
+        <button class="part-btn active" data-part="walls">Стены</button>
+        <button class="part-btn" data-part="roof">Крыша</button>
+        <button class="part-btn" data-part="floor">Пол</button>
+        <button class="part-btn" data-part="entrance">Вход</button>
+      </div>
+
+      <div class="color-panel">
+        <h3 id="colorTitle">Цвет стен</h3>
+        <div class="colors" id="colors"></div>
+      </div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="order-form">
+        <h3>Оформить заказ</h3>
+        <input type="text" id="nameInput" placeholder="Ваше имя">
+        <input type="tel" id="phoneInput" placeholder="Телефон">
+        <button class="submit-btn" onclick="sendOrder()">Отправить в Telegram</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Палитра цветов
+  const palette = [
+    { name: 'Светлое дерево', hex: '#D4B48C' },
+    { name: 'Натуральное',    hex: '#C0915F' },
+    { name: 'Тёмное дерево',  hex: '#7B5230' },
+    { name: 'Орех',           hex: '#5C3A1E' },
+    { name: 'Под лак',        hex: '#8B6F47' },
+    { name: 'Белый',          hex: '#F5F5F5' },
+    { name: 'Серый',          hex: '#9E9E9E' },
+    { name: 'Тёмно-серый',    hex: '#4A4A4A' },
+    { name: 'Зелёный',        hex: '#4A7C59' },
+    { name: 'Синий',          hex: '#3A5A8C' },
+    { name: 'Красный',        hex: '#A0392B' },
+    { name: 'Коричневый',     hex: '#6B4423' }
+  ];
+
+  // Цвета по умолчанию для каждой детали
+  const parts = {
+    walls:    { name: 'Стены', color: '#C0915F' },
+    roof:     { name: 'Крыша', color: '#A0704A' },
+    floor:    { name: 'Пол',   color: '#7B5230' },
+    entrance: { name: 'Вход',  color: '#3D2410' }
+  };
+
+  let activePart = 'walls';
+
+  // Рисуем палитру
+  const colorsEl = document.getElementById('colors');
+  palette.forEach((c, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch';
+    sw.style.background = c.hex;
+    sw.dataset.hex = c.hex;
+    sw.dataset.name = c.name;
+    sw.title = c.name;
+    sw.innerHTML = `<span>${c.name}</span>`;
+    sw.onclick = () => selectColor(c.hex, c.name);
+    colorsEl.appendChild(sw);
+  });
+
+  function selectColor(hex, name) {
+    // Красим активную деталь
+    document.querySelectorAll(`[data-part="${activePart}"] polygon, [data-part="${activePart}"] rect, [data-part="${activePart}"] circle`).forEach(el => {
+      // Только первый элемент с заливкой, чтобы не закрасить декоративные overlay
+      if (!el.hasAttribute('fill') || el.getAttribute('fill').startsWith('#')) {
+        el.setAttribute('fill', hex);
+      }
+    });
+
+    parts[activePart].color = hex;
+    parts[activePart].colorName = name;
+
+    // Подсветить выбранный свотч
+    document.querySelectorAll('.color-swatch').forEach(s => {
+      s.classList.toggle('selected', s.dataset.hex === hex);
+    });
+
+    updateSummary();
+  }
+
+  function setActivePart(part) {
+    activePart = part;
+    document.querySelectorAll('.part-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.part === part);
+    });
+    document.getElementById('colorTitle').textContent = 'Цвет: ' + parts[part].name;
+    // Подсветить активную деталь на схеме
+    document.querySelectorAll('#doghouse g').forEach(g => {
+      g.classList.toggle('active', g.dataset.part === part);
+    });
+  }
+
+  // Клик по кнопкам-деталям
+  document.querySelectorAll('.part-btn').forEach(btn => {
+    btn.onclick = () => setActivePart(btn.dataset.part);
+  });
+
+  // Клик по схеме
+  document.querySelectorAll('#doghouse g[data-part]').forEach(g => {
+    g.onclick = () => setActivePart(g.dataset.part);
+  });
+
+  // Итоговая сводка
+  function updateSummary() {
+    const s = document.getElementById('summary');
+    s.innerHTML = `
+      <strong>Ваша конфигурация:</strong>
+      <div class="row"><span>Стены</span><span>${parts.walls.colorName || 'Натуральное'}</span></div>
+      <div class="row"><span>Крыша</span><span>${parts.roof.colorName || 'Натуральное'}</span></div>
+      <div class="row"><span>Пол</span><span>${parts.floor.colorName || 'Натуральное'}</span></div>
+      <div class="row"><span>Вход</span><span>${parts.entrance.colorName || 'Натуральное'}</span></div>
+    `;
+  }
+  updateSummary();
+
+  // Отправка в Telegram
+  function sendOrder() {
+    const name = document.getElementById('nameInput').value.trim();
+    const phone = document.getElementById('phoneInput').value.trim();
+
+    if (!name || !phone) {
+      alert('Пожалуйста, введите имя и телефон');
+      return;
+    }
+
+    const text =
+`🐶 Заявка с сайта «Мастерская Савеловых»
+
+Имя: ${name}
+Телефон: ${phone}
+
+Конфигурация будки:
+• Стены: ${parts.walls.colorName || 'Натуральное'}
+• Крыша: ${parts.roof.colorName || 'Натуральное'}
+• Пол: ${parts.floor.colorName || 'Натуральное'}
+• Вход: ${parts.entrance.colorName || 'Натуральное'}`;
+
+    const url = `https://t.me/savelov_workshop?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  }
+
+  setActivePart('walls');
+</script>
+
+</body>
+</html>
